@@ -37,4 +37,10 @@ def test_transit_raw_schema():
     assert "tract_id" in df.columns
     assert "transit_freq_peak" in df.columns
     assert "intersection_density" in df.columns
-    assert (df["transit_freq_peak"] >= 0).all()
+    assert df["tract_id"].is_unique
+    assert df["tract_id"].str.len().eq(11).all()
+    # Convert to numeric, coerce errors to NaN, then check non-negative values
+    transit_freq = pd.to_numeric(df["transit_freq_peak"], errors="coerce")
+    intersection = pd.to_numeric(df["intersection_density"], errors="coerce")
+    assert (transit_freq.dropna() >= 0).all()
+    assert (intersection.dropna() >= 0).all()

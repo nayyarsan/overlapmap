@@ -8,7 +8,6 @@ import glob
 import pandas as pd
 import geopandas as gpd
 from pipeline.config import EPA_SLD_DIR, RAW_DIR, LA_FIPS_FULL
-from pipeline.utils.cache import is_static
 
 OUT_PATH = RAW_DIR / "transit_raw.csv"
 
@@ -75,9 +74,6 @@ def fetch() -> None:
         }), include_groups=False)
         .reset_index()
     )
-
-    # Tracts with no transit service get 0 frequency (not missing data — they have zero service)
-    result["transit_freq_peak"] = result["transit_freq_peak"].fillna(0.0)
 
     result.to_csv(OUT_PATH, index=False)
     print(f"transit: wrote {len(result)} tracts to {OUT_PATH}")
