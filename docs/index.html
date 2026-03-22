@@ -12,38 +12,54 @@
 <header>
   <div>
     <h1>OverlapMap</h1>
-    <div class="subtitle">LA County Neighborhood Scorer</div>
+    <div class="subtitle">Find your ideal LA neighborhood — adjust what matters to you and the map updates instantly</div>
   </div>
 </header>
 
 <div class="main">
   <div id="sidebar">
-    <div class="section-title">Score Weights</div>
+    <div class="section-title">What matters to you?</div>
+    <div class="sidebar-intro">Raise a slider to give that factor more influence on the score. Green = better, red = worse.</div>
 
     <div class="layer-row" data-layer="crime">
-      <label><input type="checkbox" checked /> Crime Rate</label>
-      <input type="range" min="0" max="10" value="8" step="1" />
-      <span class="weight-val">8</span>
+      <div class="layer-controls">
+        <label><input type="checkbox" checked /> Crime Rate</label>
+        <input type="range" min="0" max="10" value="8" step="1" />
+        <span class="weight-val">8</span>
+      </div>
+      <div class="layer-hint">Raise if low crime is important — high-crime areas will score lower</div>
     </div>
     <div class="layer-row" data-layer="fire">
-      <label><input type="checkbox" checked /> Fire Risk</label>
-      <input type="range" min="0" max="10" value="7" step="1" />
-      <span class="weight-val">7</span>
+      <div class="layer-controls">
+        <label><input type="checkbox" checked /> Fire Risk</label>
+        <input type="range" min="0" max="10" value="7" step="1" />
+        <span class="weight-val">7</span>
+      </div>
+      <div class="layer-hint">Raise if wildfire risk is a dealbreaker for you</div>
     </div>
     <div class="layer-row" data-layer="env">
-      <label><input type="checkbox" checked /> Environment</label>
-      <input type="range" min="0" max="10" value="5" step="1" />
-      <span class="weight-val">5</span>
+      <div class="layer-controls">
+        <label><input type="checkbox" checked /> Environment</label>
+        <input type="range" min="0" max="10" value="5" step="1" />
+        <span class="weight-val">5</span>
+      </div>
+      <div class="layer-hint">Raise if air quality and pollution burden matter to you</div>
     </div>
     <div class="layer-row" data-layer="school">
-      <label><input type="checkbox" checked /> Schools</label>
-      <input type="range" min="0" max="10" value="6" step="1" />
-      <span class="weight-val">6</span>
+      <div class="layer-controls">
+        <label><input type="checkbox" checked /> Schools</label>
+        <input type="range" min="0" max="10" value="6" step="1" />
+        <span class="weight-val">6</span>
+      </div>
+      <div class="layer-hint">Raise if school quality is your top priority</div>
     </div>
     <div class="layer-row" data-layer="transit">
-      <label><input type="checkbox" checked /> Transit / Walk</label>
-      <input type="range" min="0" max="10" value="4" step="1" />
-      <span class="weight-val">4</span>
+      <div class="layer-controls">
+        <label><input type="checkbox" checked /> Transit / Walk</label>
+        <input type="range" min="0" max="10" value="4" step="1" />
+        <span class="weight-val">4</span>
+      </div>
+      <div class="layer-hint">Raise if walkability and public transit access matter</div>
     </div>
 
     <div class="sidebar-footer">
