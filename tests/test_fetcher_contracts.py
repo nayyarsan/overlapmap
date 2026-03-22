@@ -44,3 +44,11 @@ def test_transit_raw_schema():
     intersection = pd.to_numeric(df["intersection_density"], errors="coerce")
     assert (transit_freq.dropna() >= 0).all()
     assert (intersection.dropna() >= 0).all()
+
+
+def test_schools_raw_schema():
+    df = _load("schools")
+    assert "tract_id" in df.columns
+    assert "school_avg_rating" in df.columns
+    ratings = pd.to_numeric(df["school_avg_rating"], errors="coerce").dropna()
+    assert ratings.between(0, 100, inclusive="both").all()

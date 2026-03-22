@@ -66,11 +66,15 @@ CALENVIRO_URL = (
 
 # CDE CAASPP bulk download (seed URL — actual annual file resolved manually)
 CDE_CAASPP_URL = "https://caaspp-elpac.ets.org/caaspp/ResearchFileList"
+# CDE CAASPP 2024-25 All Students research file (8 MB)
+CAASPP_CSV_URL = "https://caaspp-elpac.ets.org/caaspp/researchfiles/sb_ca2025_1_csv_v1.zip"
 # CDE School Directory (geocoded)
 CDE_SCHOOLS_URL = (
     "https://www.cde.ca.gov/schooldirectory/report?"
     "rid=dl1&tp=csv&ict=Y&nm=publicSchoolsDB"
 )
+# Alias used by schools fetcher
+CDE_SCHOOL_DIR_URL = CDE_SCHOOLS_URL
 
 # Census TIGER/Line CA state tracts (2023 vintage — filter to 06037 on load)
 TIGER_URL = (
