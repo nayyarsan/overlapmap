@@ -1,8 +1,13 @@
+# Claude Code settings
+.claude/
 # Generated data — large files not committed except where noted
 data/raw/
+!data/raw/.gitkeep
 data/static/
 # Exception: scored output is committed so GitHub Pages can serve it
 !docs/data/scored_tracts.topojson
+# Plan/spec docs should not be served by GitHub Pages
+docs/superpowers/
 # Python
 __pycache__/
 *.pyc
