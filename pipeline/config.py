@@ -47,12 +47,15 @@ LASD_CFS_URL = (
     "lacounty::lasd-calls-for-service/api"
 )
 
-# CAL FIRE FHSZ shapefiles
+# CAL FIRE FHSZ — ArcGIS FeatureServer endpoints (original fire.ca.gov zip URLs return 403)
+# LACoFD-hosted LA County layers (public, no auth); field: HAZ_CLASS
 CALFIRE_SRA_URL = (
-    "https://www.fire.ca.gov/media/t1rdhjo4/fhsz_sra_19_1.zip"
+    "https://services.arcgis.com/RmCCgQtiZLDCtblq/arcgis/rest/services/"
+    "LACoFD_Fire_Hazard_Severity_Zones_SRA/FeatureServer/0"
 )
 CALFIRE_LRA_URL = (
-    "https://www.fire.ca.gov/media/ohfby1gj/fhsz_lra_19_1.zip"
+    "https://services.arcgis.com/RmCCgQtiZLDCtblq/arcgis/rest/services/"
+    "LACoFD_Fire_Hazard_Severity_Zones_LRA/FeatureServer/0"
 )
 
 # CalEnviroScreen 4.0 (Zenodo mirror of OEHHA data)
