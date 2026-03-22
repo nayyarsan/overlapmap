@@ -61,3 +61,5 @@ def test_crime_raw_schema():
     assert "tract_id" in df.columns
     assert "crime_incidents_per_1k" in df.columns
     assert (df["crime_incidents_per_1k"] >= 0).all()
+    assert df["tract_id"].is_unique
+    assert df["tract_id"].str.len().eq(11).all()

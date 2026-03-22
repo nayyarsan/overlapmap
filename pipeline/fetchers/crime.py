@@ -14,7 +14,7 @@ import pandas as pd
 import geopandas as gpd
 from pipeline.config import (
     RAW_DIR, BOUNDARIES_DIR, CACHE_MAX_AGE_DAYS,
-    LAPD_NIBRS_OFFENSES_URL, LAPD_NIBRS_VICTIMS_URL,
+    LAPD_NIBRS_OFFENSES_URL,
     LASD_CFS_URL, LA_BBOX, LA_FIPS_FULL,
 )
 from pipeline.utils.cache import is_fresh
@@ -86,6 +86,7 @@ def _lapd_to_common(df: pd.DataFrame) -> pd.DataFrame:
     """Normalize LAPD NIBRS Offenses dataset to common schema."""
     # NIBRS offenses has: dr_no (incident number), date_occ, crm_cd_desc,
     # location_1_latitude, location_1_longitude (from nested location_1 column)
+    # Socrata flattens nested fields: location_1.latitude → location_1_latitude in JSON response
     df = df.rename(columns={
         "dr_no":                  "incident_id",
         "date_occ":               "incident_date",
@@ -100,17 +101,17 @@ def _lapd_to_common(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _lasd_to_common(df: pd.DataFrame) -> pd.DataFrame:
-    """Normalize LASD Calls For Service to common schema."""
-    # Column names vary — map best-effort
+    """Normalize LASD Calls For Service to common schema.
+
+    Note: _fetch_arcgis_all guarantees geometry columns are named "latitude" and "longitude".
+    This function only needs to discover incident_id and incident_date field names.
+    """
+    # Column names vary — map best-effort for incident_id and incident_date
     col_map = {}
     for c in df.columns:
         cl = c.lower()
         if "incident" in cl and "id" in cl:
             col_map[c] = "incident_id"
-        elif "lat" in cl:
-            col_map[c] = "latitude"
-        elif "lon" in cl:
-            col_map[c] = "longitude"
         elif "date" in cl:
             col_map[c] = "incident_date"
     df = df.rename(columns=col_map)
@@ -158,13 +159,14 @@ def fetch() -> None:
         lasd = _bbox_filter(lasd)
         print(f"  LASD: {len(lasd)} incidents")
         combined = pd.concat([lapd, lasd], ignore_index=True)
-    except Exception as e:
+    except (requests.HTTPError, requests.ConnectionError, requests.Timeout) as e:
         print(f"  LASD fetch failed ({e}) — using LAPD only")
         combined = lapd
 
     # Spatial join to census tracts
     shp_files = list(BOUNDARIES_DIR.glob("*.shp"))
     tracts = gpd.read_file(shp_files[0]).to_crs(epsg=4326)
+    tracts = tracts[tracts["GEOID"].str.startswith(LA_FIPS_FULL)].copy()
     tracts["tract_id"] = tracts["GEOID"].astype(str).str.zfill(11)
 
     incidents_gdf = gpd.GeoDataFrame(
