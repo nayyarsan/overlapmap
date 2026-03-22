@@ -47,6 +47,8 @@ function computeComposite(props, weights) {
 
 // ── Map setup ─────────────────────────────────────────────────────────────────
 const map = L.map('map', { center: [34.05, -118.25], zoom: 10 });
+// Force Leaflet to recompute container size after flex layout settles
+setTimeout(() => map.invalidateSize(), 100);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
   maxZoom: 19,

@@ -42,6 +42,7 @@ header .subtitle { font-size: 0.75rem; color: var(--text-muted); }
   display: flex;
   flex: 1;
   overflow: hidden;
+  min-height: 0; /* required for Leaflet to compute container height in flex layout */
 }
 
 /* Sidebar */
@@ -110,7 +111,7 @@ header .subtitle { font-size: 0.75rem; color: var(--text-muted); }
 .sidebar-footer a { color: var(--accent); text-decoration: none; }
 
 /* Map */
-#map { flex: 1; }
+#map { flex: 1; min-height: 0; }
 
 /* Popup */
 .om-popup {
