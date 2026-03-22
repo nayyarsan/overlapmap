@@ -69,10 +69,10 @@ CDE_SCHOOLS_URL = (
     "rid=dl1&tp=csv&ict=Y&nm=publicSchoolsDB"
 )
 
-# Census TIGER/Line LA County tracts (2023 vintage)
+# Census TIGER/Line CA state tracts (2023 vintage — filter to 06037 on load)
 TIGER_URL = (
     "https://www2.census.gov/geo/tiger/TIGER2023/TRACT/"
-    "tl_2023_06037_tract.zip"
+    "tl_2023_06_tract.zip"
 )
 
 # EPA Smart Location Database v3
