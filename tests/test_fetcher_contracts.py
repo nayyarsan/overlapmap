@@ -63,3 +63,19 @@ def test_crime_raw_schema():
     assert (df["crime_incidents_per_1k"] >= 0).all()
     assert df["tract_id"].is_unique
     assert df["tract_id"].str.len().eq(11).all()
+
+
+def test_rent_raw_schema():
+    df = _load("rent")
+    assert "tract_id" in df.columns
+    assert "rent_2br_median" in df.columns
+    assert df["tract_id"].is_unique
+    assert df["tract_id"].str.len().eq(11).all()
+
+
+def test_property_age_raw_schema():
+    df = _load("property_age")
+    assert "tract_id" in df.columns
+    assert "median_year_built" in df.columns
+    assert df["tract_id"].is_unique
+    assert df["tract_id"].str.len().eq(11).all()
