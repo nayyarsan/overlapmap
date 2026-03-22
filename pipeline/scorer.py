@@ -68,7 +68,9 @@ def build_scores_df(merged: pd.DataFrame) -> pd.DataFrame:
         if col not in merged.columns:
             merged[cfg["score_col"]] = None
             continue
-        values = merged[col].tolist()
+        # Convert pandas NaN to Python None — normalize_metric uses `is not None` guard
+        series = merged[col]
+        values = [None if pd.isna(v) else v for v in series.tolist()]
         scores = normalize_metric(values, direction=cfg["direction"])
         merged[cfg["score_col"]] = scores
     return merged
@@ -162,6 +164,13 @@ def run() -> None:
 
     output["data_updated"] = str(date.today())
 
+    # Replace any remaining pandas NaN with None so JSON output stays valid
+    # (topojson serializes float NaN as the bare token NaN, which is invalid JSON)
+    for c in output.columns:
+        if c == "geometry":
+            continue
+        output[c] = output[c].where(output[c].notna(), other=None)
+
     # 7. Simplify polygons
     output["geometry"] = output["geometry"].simplify(tolerance=0.0001, preserve_topology=True)
 
@@ -171,8 +180,12 @@ def run() -> None:
 
     # 9. Convert to TopoJSON and write for GitHub Pages
     topo = tp.Topology(output, prequantize=False)
+    topo_json = topo.to_json()
+    # topojson serializes float NaN as bare NaN (invalid JSON); replace with null
+    import re as _re
+    topo_json = _re.sub(r'\bNaN\b', 'null', topo_json)
     with open(TOPOJSON_OUT, "w") as f:
-        f.write(topo.to_json())
+        f.write(topo_json)
     size_mb = TOPOJSON_OUT.stat().st_size / 1_000_000
     print(f"scorer: wrote TopoJSON to {TOPOJSON_OUT} ({size_mb:.1f} MB)")
 
