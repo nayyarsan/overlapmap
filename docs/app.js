@@ -36,11 +36,12 @@ function computeComposite(props, weights) {
   let total = 0, totalW = 0;
   for (const layer of LAYERS) {
     const w = weights[layer.id] || 0;
+    if (w === 0) continue;
     const s = props[layer.scoreKey];
-    if (w > 0 && s != null) {
-      total  += w * s;
-      totalW += w;
-    }
+    // Always include weight in denominator — missing data scores 0, not absent.
+    // Prevents a tract with no school data from looking green when schools weight is high.
+    totalW += w;
+    if (s != null) total += w * s;
   }
   return totalW > 0 ? total / totalW : null;
 }
