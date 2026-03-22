@@ -55,10 +55,10 @@ CALFIRE_LRA_URL = (
     "https://www.fire.ca.gov/media/ohfby1gj/fhsz_lra_19_1.zip"
 )
 
-# CalEnviroScreen 4.0
+# CalEnviroScreen 4.0 (Zenodo mirror of OEHHA data)
 CALENVIRO_URL = (
-    "https://oehha.ca.gov/media/downloads/calenviroscreen/document/"
-    "calenviroscreen40resultsdatadictionaryf2021.zip"
+    "https://zenodo.org/api/records/14563093/files/"
+    "calenviroscreen40resultsdatadictionaryf2021.zip/content"
 )
 
 # CDE CAASPP bulk download (seed URL — actual annual file resolved manually)
