@@ -22,7 +22,7 @@ import pandas as pd
 import geopandas as gpd
 from pipeline.config import (
     RAW_DIR, BOUNDARIES_DIR, CACHE_MAX_AGE_DAYS,
-    CAASPP_CSV_URL, CDE_SCHOOL_DIR_URL,
+    CAASPP_CSV_URL,
 )
 from pipeline.utils.cache import is_fresh
 
@@ -87,11 +87,13 @@ def fetch() -> None:
     # ---- Filter CAASPP to LA County, school level, all grades, ELA + Math ----
     # Type ID 7 = school-level; Grade 13 = all grades combined
     # Test ID 1 = ELA, 2 = Math; County Code 19 = Los Angeles
+    # Student Group ID 1 = all students
     mask = (
         (caaspp["County Code"].str.strip() == _LA_CDE_COUNTY) &
         (caaspp["Type ID"].str.strip() == "7") &
         (caaspp["Grade"].str.strip() == "13") &
-        (caaspp["Test ID"].str.strip().isin(["1", "2"]))
+        (caaspp["Test ID"].str.strip().isin(["1", "2"])) &
+        (caaspp["Student Group ID"].str.strip() == "1")
     )
     caaspp_la = caaspp[mask].copy()
     print(f"schools: {len(caaspp_la)} CAASPP rows after LA/grade/subject filter")
