@@ -54,3 +54,10 @@ def test_schools_raw_schema():
     assert ratings.between(0, 100, inclusive="both").all()
     assert df["tract_id"].is_unique
     assert df["tract_id"].str.len().eq(11).all()
+
+
+def test_crime_raw_schema():
+    df = _load("crime")
+    assert "tract_id" in df.columns
+    assert "crime_incidents_per_1k" in df.columns
+    assert (df["crime_incidents_per_1k"] >= 0).all()
