@@ -1,0 +1,11 @@
+{
+  "title": "LA County Neighborhood Scores",
+  "id": "REPLACE_WITH_YOUR_KAGGLE_USERNAME/la-county-neighborhood-scores",
+  "_note": "Replace REPLACE_WITH_YOUR_KAGGLE_USERNAME with your actual Kaggle username before running 'kaggle datasets create'",
+  "licenses": [{ "name": "CC0-1.0" }],
+  "keywords": [
+    "los angeles", "la county", "neighborhood", "crime", "schools",
+    "fire risk", "environment", "transit", "census tract", "geojson"
+  ],
+  "description": "Per-census-tract scores for LA County across 5 dimensions: crime rate (LAPD+LASD), fire hazard (CAL FIRE FHSZ), environmental burden (CalEnviroScreen 4.0), school quality (CDE CAASPP), and transit access (EPA Smart Location Database). All sources are public US/CA government data. Updated monthly. Companion to https://YOUR_GITHUB_USERNAME.github.io/overlapmap"
+}
