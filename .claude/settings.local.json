@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:api.census.gov)",
+      "WebFetch(domain:data.lacounty.gov)",
+      "WebFetch(domain:www.cde.ca.gov)",
+      "WebFetch(domain:www.meganslaw.ca.gov)"
+    ]
+  }
+}

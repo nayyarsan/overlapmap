@@ -1,0 +1,36 @@
+{
+  "version": "0.1.0",
+  "last_updated": null,
+  "sources": {
+    "crime": {
+      "lapd_nibrs_offenses": "https://data.lacity.org/resource/d5tf-ez2w.json",
+      "lapd_nibrs_victims": "https://data.lacity.org/resource/gqf2-vm2j.json",
+      "lasd_cfs": "https://egis-lacounty.hub.arcgis.com"
+    },
+    "fire": {
+      "calfire_sra": "https://www.fire.ca.gov",
+      "calfire_lra": "https://www.fire.ca.gov"
+    },
+    "environment": {
+      "calenviroscreen_40": "https://oehha.ca.gov/calenviroscreen"
+    },
+    "schools": {
+      "cde_caaspp": "https://caaspp-elpac.ets.org/caaspp/ResearchFileList"
+    },
+    "transit": {
+      "epa_sld_v3": "https://www.epa.gov/smartgrowth/smart-location-mapping"
+    },
+    "rent": {
+      "census_acs_5yr": "https://api.census.gov/data/2022/acs/acs5",
+      "variable": "B25031_004E"
+    },
+    "property_age": {
+      "census_acs_5yr": "https://api.census.gov/data/2022/acs/acs5",
+      "variable": "B25035_001E"
+    },
+    "boundaries": {
+      "tiger_line_2023": "https://www2.census.gov/geo/tiger/TIGER2023/TRACT/"
+    }
+  },
+  "license": "CC0 (all sources are public government data)"
+}
