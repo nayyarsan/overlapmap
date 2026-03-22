@@ -22,7 +22,7 @@ import pandas as pd
 import geopandas as gpd
 from pipeline.config import (
     RAW_DIR, BOUNDARIES_DIR, CACHE_MAX_AGE_DAYS,
-    CAASPP_CSV_URL,
+    CAASPP_CSV_URL, CDE_SCHOOL_DIR_URL,
 )
 from pipeline.utils.cache import is_fresh
 
@@ -32,11 +32,6 @@ _SCHOOLS_PATH  = RAW_DIR / "_school_dir_raw.csv"
 
 # LA County code in CDE/CAASPP system
 _LA_CDE_COUNTY = "19"
-
-# CDE School Directory actual download URL (tp=txt returns tab-delimited CSV)
-_SCHOOL_DIR_DOWNLOAD_URL = (
-    "https://www.cde.ca.gov/schooldirectory/report?rid=dl1&tp=txt"
-)
 
 
 def _fetch_caaspp() -> pd.DataFrame:
@@ -54,6 +49,10 @@ def _fetch_caaspp() -> pd.DataFrame:
         ]
         if not csv_names:
             csv_names = [n for n in z.namelist() if n.endswith(".txt") or n.endswith(".csv")]
+        if not csv_names:
+            raise RuntimeError(
+                f"No data .txt/.csv found in CAASPP zip. Contents: {z.namelist()}"
+            )
         with z.open(csv_names[0]) as f:
             df = pd.read_csv(f, dtype=str, encoding="latin-1", sep="^")
     df.to_csv(_CAASPP_PATH, index=False)
@@ -64,7 +63,7 @@ def _fetch_school_directory() -> pd.DataFrame:
     if is_fresh(_SCHOOLS_PATH, days=CACHE_MAX_AGE_DAYS):
         return pd.read_csv(_SCHOOLS_PATH, dtype=str)
     print("schools: downloading CDE School Directory...")
-    resp = requests.get(_SCHOOL_DIR_DOWNLOAD_URL, timeout=120)
+    resp = requests.get(CDE_SCHOOL_DIR_URL, timeout=120)
     resp.raise_for_status()
     df = pd.read_csv(io.StringIO(resp.text), dtype=str, sep="\t")
     df.to_csv(_SCHOOLS_PATH, index=False)
@@ -113,6 +112,10 @@ def fetch() -> None:
 
     # ---- Filter School Directory to LA County, extract last 7 digits of CDSCode ----
     dir_la = school_dir[school_dir["County"].str.strip() == "Los Angeles"].copy()
+    if dir_la.empty:
+        raise RuntimeError(
+            f"No LA County schools found in School Directory — check 'County' column values: {school_dir['County'].unique()[:10]}"
+        )
     dir_la["school_code_7"] = dir_la["CDSCode"].str.strip().str[-7:]
     print(f"schools: {len(dir_la)} LA County schools in directory")
 
@@ -155,6 +158,9 @@ def fetch() -> None:
         how="left",
         predicate="within"
     )
+    unmatched = joined["tract_id"].isna().sum()
+    if unmatched:
+        print(f"schools: {unmatched} schools unmatched (no tract within 0.5 miles) — check coordinates")
 
     # ---- Mean school rating per tract ----
     tract_scores = (

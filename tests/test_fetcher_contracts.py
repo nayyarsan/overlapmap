@@ -52,3 +52,5 @@ def test_schools_raw_schema():
     assert "school_avg_rating" in df.columns
     ratings = pd.to_numeric(df["school_avg_rating"], errors="coerce").dropna()
     assert ratings.between(0, 100, inclusive="both").all()
+    assert df["tract_id"].is_unique
+    assert df["tract_id"].str.len().eq(11).all()
