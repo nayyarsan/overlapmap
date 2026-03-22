@@ -71,6 +71,8 @@ def test_rent_raw_schema():
     assert "rent_2br_median" in df.columns
     assert df["tract_id"].is_unique
     assert df["tract_id"].str.len().eq(11).all()
+    rent_values = pd.to_numeric(df["rent_2br_median"], errors="coerce").dropna()
+    assert (rent_values > 0).all()
 
 
 def test_property_age_raw_schema():
@@ -79,3 +81,6 @@ def test_property_age_raw_schema():
     assert "median_year_built" in df.columns
     assert df["tract_id"].is_unique
     assert df["tract_id"].str.len().eq(11).all()
+    year_values = pd.to_numeric(df["median_year_built"], errors="coerce").dropna()
+    assert (year_values >= 1800).all()
+    assert (year_values <= 2030).all()

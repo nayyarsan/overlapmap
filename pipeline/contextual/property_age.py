@@ -43,7 +43,7 @@ def fetch() -> None:
         df["tract"].str.zfill(6)
     )
     df["median_year_built"] = pd.to_numeric(df[CENSUS_AGE_VAR], errors="coerce")
-    df.loc[df["median_year_built"] < 0, "median_year_built"] = None
+    df.loc[df["median_year_built"] < 0, "median_year_built"] = None  # Census sentinel: -666666666 = missing
 
     result = df[["tract_id", "median_year_built"]]
     result.to_csv(OUT_PATH, index=False)
