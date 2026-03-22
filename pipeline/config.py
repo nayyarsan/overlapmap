@@ -77,6 +77,13 @@ TIGER_URL = (
     "tl_2023_06_tract.zip"
 )
 
+# Census TIGER/Line CA places (cities + CDPs) for place-name labeling
+TIGER_PLACES_URL = (
+    "https://www2.census.gov/geo/tiger/TIGER2023/PLACE/"
+    "tl_2023_06_place.zip"
+)
+PLACES_DIR = STATIC_DIR / "boundaries"  # store alongside tracts
+
 # EPA Smart Location Database v3 (updated URL — old /OA/EPA_SmartLocationDatabase_V3_Jan_2021_Final.zip returns 404)
 EPA_SLD_URL = (
     "https://edg.epa.gov/EPADataCommons/public/OA/SLD/"

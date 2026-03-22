@@ -19,7 +19,7 @@ import geopandas as gpd
 import topojson as tp
 from datetime import date
 from pipeline.config import (
-    RAW_DIR, BOUNDARIES_DIR, DOCS_DATA_DIR, GEOJSON_OUT,
+    RAW_DIR, BOUNDARIES_DIR, PLACES_DIR, DOCS_DATA_DIR, GEOJSON_OUT,
     TOPOJSON_OUT, METADATA_PATH,
     CENSUS_ACS_BASE, CA_STATE_FIPS, LA_COUNTY_FIPS, LA_FIPS_FULL,
 )
@@ -100,19 +100,57 @@ def _fetch_tract_population() -> pd.DataFrame:
     return df[["tract_id", "population"]]
 
 
+def _join_place_names(tracts: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    """Spatial join tract centroids to TIGER Places → place_name column.
+
+    Incorporated cities and CDPs get their official name (e.g. "Pasadena").
+    Tracts whose centroid falls outside any named place get "Unincorporated".
+    """
+    place_files = list(PLACES_DIR.glob("tl_2023_06_place*.shp"))
+    if not place_files:
+        print("  WARNING: TIGER places not found — place_name will be empty")
+        tracts["place_name"] = None
+        return tracts
+
+    places = gpd.read_file(place_files[0]).to_crs(epsg=4326)[["NAME", "geometry"]]
+
+    # Use tract centroids for the join (faster and avoids edge ambiguity)
+    # Project to CA Albers (EPSG:3310) for accurate centroid, then back to WGS84
+    centroids_geom = tracts.to_crs(epsg=3310).geometry.centroid.to_crs(epsg=4326)
+    centroids_gdf = gpd.GeoDataFrame(
+        {"tract_id": tracts["tract_id"].values},
+        geometry=centroids_geom.values,
+        crs=tracts.crs,
+    )
+
+    joined = gpd.sjoin(
+        centroids_gdf,
+        places,
+        how="left",
+        predicate="within",
+    )
+    # Drop duplicate tract_ids if a centroid hit multiple place polygons
+    joined = joined.drop_duplicates(subset="tract_id")
+
+    name_map = joined.set_index("tract_id")["NAME"]
+    tracts["place_name"] = tracts["tract_id"].map(name_map).fillna("Unincorporated")
+    return tracts
+
+
 def run() -> None:
     DOCS_DATA_DIR.mkdir(parents=True, exist_ok=True)
     RAW_DIR.mkdir(parents=True, exist_ok=True)
 
     # 1. Load TIGER/Line census tracts — filter to LA County
-    shp_files = list(BOUNDARIES_DIR.glob("*.shp"))
+    shp_files = list(BOUNDARIES_DIR.glob("tl_*_tract*.shp"))
     if not shp_files:
         raise RuntimeError("TIGER/Line not found — run static_downloads.py first")
     tracts = gpd.read_file(shp_files[0]).to_crs(epsg=4326)
     tracts["tract_id"] = tracts["GEOID"].astype(str).str.zfill(11)
     tracts = tracts[tracts["GEOID"].str.startswith(LA_FIPS_FULL)].copy()
     tracts["tract_name"] = tracts["NAMELSAD"].astype(str) + ", Los Angeles County"
-    merged = tracts[["tract_id", "tract_name", "geometry"]].copy()
+    tracts = _join_place_names(tracts)
+    merged = tracts[["tract_id", "tract_name", "place_name", "geometry"]].copy()
 
     # 2. Load population for per-1k crime rate
     pop = _fetch_tract_population()
@@ -148,7 +186,7 @@ def run() -> None:
 
     # 6. Assemble final properties
     cols_needed = [
-        "tract_id", "tract_name", "geometry",
+        "tract_id", "tract_name", "place_name", "geometry",
         "crime_score", "fire_score", "env_score", "school_score", "transit_score",
         "crime_incidents_per_1k", "dominant_hazard_class", "calenviro_score",
         "school_avg_rating", "transit_freq_peak",

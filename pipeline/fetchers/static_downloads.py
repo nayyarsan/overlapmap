@@ -9,8 +9,8 @@ import zipfile
 import io
 import requests
 from pipeline.config import (
-    TIGER_URL, EPA_SLD_URL,
-    BOUNDARIES_DIR, EPA_SLD_DIR,
+    TIGER_URL, TIGER_PLACES_URL, EPA_SLD_URL,
+    BOUNDARIES_DIR, PLACES_DIR, EPA_SLD_DIR,
 )
 
 
@@ -45,7 +45,22 @@ def download_epa_sld() -> None:
     print(f"  extracted to {EPA_SLD_DIR}")
 
 
+def download_tiger_places() -> None:
+    """Download CA places (cities + CDPs) for place-name labeling in popups."""
+    if any(PLACES_DIR.glob("tl_2023_06_place*.shp")):
+        print("TIGER/Line places already present — skipping.")
+        return
+    print("Downloading TIGER/Line CA places (~5MB)...")
+    PLACES_DIR.mkdir(parents=True, exist_ok=True)
+    resp = requests.get(TIGER_PLACES_URL, timeout=120)
+    resp.raise_for_status()
+    with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
+        z.extractall(PLACES_DIR)
+    print(f"  extracted to {PLACES_DIR}")
+
+
 if __name__ == "__main__":
     download_tiger_tracts()
+    download_tiger_places()
     download_epa_sld()
     print("Static downloads complete.")

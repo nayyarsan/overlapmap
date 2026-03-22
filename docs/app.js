@@ -125,7 +125,7 @@ function showPopup(feature, layer, weights) {
 
   const html = `
     <div class="om-popup">
-      <h3>${p.tract_name || p.tract_id}</h3>
+      <h3>${p.place_name ? p.place_name + ' — ' : ''}${p.tract_name || p.tract_id}</h3>
       <div class="composite-score" style="color:${compositeColor}">${compositeStr} / 10</div>
       ${scoreBars}
       <hr class="popup-divider" />
