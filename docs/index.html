@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OverlapMap — LA County Neighborhood Scorer</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>OverlapMap</h1>
+    <div class="subtitle">LA County Neighborhood Scorer</div>
+  </div>
+</header>
+
+<div class="main">
+  <div id="sidebar">
+    <div class="section-title">Score Weights</div>
+
+    <div class="layer-row" data-layer="crime">
+      <label><input type="checkbox" checked /> Crime Rate</label>
+      <input type="range" min="0" max="10" value="8" step="1" />
+      <span class="weight-val">8</span>
+    </div>
+    <div class="layer-row" data-layer="fire">
+      <label><input type="checkbox" checked /> Fire Risk</label>
+      <input type="range" min="0" max="10" value="7" step="1" />
+      <span class="weight-val">7</span>
+    </div>
+    <div class="layer-row" data-layer="env">
+      <label><input type="checkbox" checked /> Environment</label>
+      <input type="range" min="0" max="10" value="5" step="1" />
+      <span class="weight-val">5</span>
+    </div>
+    <div class="layer-row" data-layer="school">
+      <label><input type="checkbox" checked /> Schools</label>
+      <input type="range" min="0" max="10" value="6" step="1" />
+      <span class="weight-val">6</span>
+    </div>
+    <div class="layer-row" data-layer="transit">
+      <label><input type="checkbox" checked /> Transit / Walk</label>
+      <input type="range" min="0" max="10" value="4" step="1" />
+      <span class="weight-val">4</span>
+    </div>
+
+    <div class="sidebar-footer">
+      <div id="data-updated"></div>
+      <div style="margin-top:6px">
+        <a href="https://www.kaggle.com/datasets/la-county-neighborhood-scores"
+           target="_blank">↓ Download dataset on Kaggle</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="map"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/chroma-js@3.2.0/chroma.min.js"></script>
+<script src="https://unpkg.com/topojson-client@3/dist/topojson-client.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
