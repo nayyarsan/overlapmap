@@ -78,10 +78,10 @@ TIGER_URL = (
     "tl_2023_06_tract.zip"
 )
 
-# EPA Smart Location Database v3
+# EPA Smart Location Database v3 (updated URL — old /OA/EPA_SmartLocationDatabase_V3_Jan_2021_Final.zip returns 404)
 EPA_SLD_URL = (
-    "https://edg.epa.gov/EPADataCommons/public/OA/"
-    "EPA_SmartLocationDatabase_V3_Jan_2021_Final.zip"
+    "https://edg.epa.gov/EPADataCommons/public/OA/SLD/"
+    "SmartLocationDatabaseV3.zip"
 )
 
 # Kaggle dataset slug

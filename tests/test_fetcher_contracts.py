@@ -30,3 +30,11 @@ def test_fire_raw_schema():
     valid_classes = {"None", "Moderate", "High", "Very High"}
     assert set(df["dominant_hazard_class"].unique()).issubset(valid_classes)
     assert df["hazard_score_input"].between(0, 10, inclusive="both").all()
+
+
+def test_transit_raw_schema():
+    df = _load("transit")
+    assert "tract_id" in df.columns
+    assert "transit_freq_peak" in df.columns
+    assert "intersection_density" in df.columns
+    assert (df["transit_freq_peak"] >= 0).all()
