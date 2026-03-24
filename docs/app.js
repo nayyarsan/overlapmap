@@ -13,13 +13,16 @@ const LAYERS = [
   { id: 'transit', scoreKey: 'transit_score', displayKey: 'transit_freq_peak',      label: 'Transit',     fmt: v => v != null ? v.toFixed(1) : 'N/A' },
 ];
 
-// Color scale: 0=red, 5=amber, 10=green
+// Color scale: 0=red, 5=amber, 10=green (used as fallback / fixed reference)
 const COLOR_SCALE = chroma.scale(['#f44336', '#ff9800', '#8bc34a', '#4caf50'])
   .domain([0, 3.5, 6.0, 10]);
 
 // ── State ────────────────────────────────────────────────────────────────────
 let geojsonLayer = null;
 let featuresCache = [];
+// Active color scale — rebuilt dynamically on each render to stretch across
+// the actual score range so narrow clusters (e.g. schools 8–10) are visible.
+let activeColorScale = COLOR_SCALE;
 
 function getWeights() {
   const weights = {};
@@ -75,6 +78,38 @@ fetch('./data/scored_tracts.topojson')
   })
   .catch(err => console.error('Failed to load TopoJSON:', err));
 
+// ── Dynamic color scale ───────────────────────────────────────────────────────
+// Rebuild the color scale so it stretches across the actual min→max range of
+// composite scores.  When only high-scoring layers (e.g. schools) are active,
+// the fixed 0–10 domain would make every tract look the same shade of green.
+// A dynamic domain makes the color variation visible regardless of the range.
+function buildDynamicColorScale(lo, hi) {
+  const spread = hi - lo;
+  if (spread < 0.01) return COLOR_SCALE; // all tracts identical — keep neutral scale
+  return chroma.scale(['#f44336', '#ff9800', '#8bc34a', '#4caf50'])
+    .domain([lo, lo + spread * 0.35, lo + spread * 0.60, hi]);
+}
+
+// ── Legend ────────────────────────────────────────────────────────────────────
+function updateLegend(lo, hi) {
+  const legend = document.getElementById('map-legend');
+  if (!legend) return;
+  if (lo == null) {
+    legend.style.display = 'none';
+    return;
+  }
+  legend.style.display = 'block';
+  legend.innerHTML = `
+    <div class="legend-title">Score range</div>
+    <div class="legend-bar">
+      <span class="legend-lo">${lo.toFixed(1)}</span>
+      <div class="legend-gradient"></div>
+      <span class="legend-hi">${hi.toFixed(1)}</span>
+    </div>
+    <div class="legend-note">Colors span actual range</div>
+  `;
+}
+
 // ── Render ────────────────────────────────────────────────────────────────────
 function renderLayer() {
   const weights = getWeights();
@@ -83,11 +118,30 @@ function renderLayer() {
     geojsonLayer.remove();
   }
 
+  // Compute all composites first so we can build a dynamic color scale.
+  // Single-pass reduce to find min and max without creating an extra array.
+  let lo = Infinity, hi = -Infinity;
+  const allScores = featuresCache
+    .map(f => computeComposite(f.properties, weights))
+    .filter(s => s != null);
+  for (const s of allScores) {
+    if (s < lo) lo = s;
+    if (s > hi) hi = s;
+  }
+
+  if (allScores.length > 0) {
+    activeColorScale = buildDynamicColorScale(lo, hi);
+    updateLegend(lo, hi);
+  } else {
+    activeColorScale = COLOR_SCALE;
+    updateLegend(null, null);
+  }
+
   geojsonLayer = L.geoJSON(featuresCache, {
     style: feature => {
       const composite = computeComposite(feature.properties, weights);
       return {
-        fillColor:   composite != null ? COLOR_SCALE(composite).hex() : '#888',
+        fillColor:   composite != null ? activeColorScale(composite).hex() : '#888',
         fillOpacity: 0.7,
         color:       '#fff',
         weight:      0.4,
@@ -105,7 +159,7 @@ function showPopup(feature, layer, weights) {
   const p = feature.properties;
   const composite = computeComposite(p, weights);
   const compositeStr = composite != null ? composite.toFixed(1) : 'N/A';
-  const compositeColor = composite != null ? COLOR_SCALE(composite).hex() : '#888';
+  const compositeColor = composite != null ? activeColorScale(composite).hex() : '#888';
 
   const scoreBars = LAYERS.map(l => {
     const score = p[l.scoreKey];
